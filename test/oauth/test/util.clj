@@ -29,9 +29,20 @@
     (is (= {:status 200} (meta body)))))
 
 (deftest test-format-base-url
-  (are [request expected]
-    (is (= expected (format-base-url request)))
-    twitter-update-status "https://api.twitter.com/1/statuses/update.json"))
+  (are [request expected] (= expected (format-base-url request))
+    twitter-update-status "https://api.twitter.com/1/statuses/update.json"
+    {:method :get 
+     :scheme "http" 
+     :server-name "EXAMPLE.COM"
+     :server-port 80
+     :uri "/r%20v/X"
+     :query-params {:id 123}} "http://example.com/r%20v/X"
+    {:method :get 
+     :scheme "https" 
+     :server-name "www.example.net"
+     :server-port 8080
+     :uri "/"
+     :query-params {:q 1}} "https://www.example.net:8080/"))
 
 (deftest test-format-authorization
   (= (str "OAuth" (format-options twitter-update-status)) (format-authorization twitter-update-status)))

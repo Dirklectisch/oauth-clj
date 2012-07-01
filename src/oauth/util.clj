@@ -7,7 +7,7 @@
            org.apache.http.entity.StringEntity)
   (:use [clj-http.util :only (base64-encode url-encode url-decode)]
         [clojure.data.json :only (read-json)]
-        [clojure.string :only (blank? join replace split upper-case)]
+        [clojure.string :only (blank? join replace split upper-case lower-case)]
         [inflections.core :only (hyphenize underscore)]
         [inflections.transform :only (transform-keys transform-values)]))
 
@@ -87,7 +87,7 @@
   (upper-case (name (or (:method request) (:request-method request)))))
 
 (defn format-base-url [request]
-  (str (root-url request) (:uri request)))
+  (str (lower-case (root-url request)) (:uri request)))
 
 (defn hmac
   ([^String algorithm ^String msg ^String key]
