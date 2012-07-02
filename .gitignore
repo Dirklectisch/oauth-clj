@@ -3,3 +3,4 @@ lib
 /.lein-failures
 /logs/debug.log
 /target
+/tmp
