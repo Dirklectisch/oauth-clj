@@ -123,7 +123,9 @@
   [request]
   (let [body (to-str (:body request))]
     (if-not (blank? body)
-      (-> (apply hash-map (split body #"[=&]"))
+      (-> (apply hash-map (flatten 
+            (map #(if (= (count %1) 1) (conj %1 "") %1) 
+                (map #(split %1 #"=") (split body #"&")))))
           (transform-values url-decode)))))
 
 (defn percent-encode

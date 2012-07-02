@@ -93,8 +93,6 @@
     "☃" "%E2%98%83"))
                                         ;
 (deftest test-parse-body-params
-  (testing "body must be key/value pairs"
-    (is (thrown? Exception (parse-body-params {:body "x"}))))
   (are [request expected]
     (is (= expected (parse-body-params request)))
     {} nil
@@ -106,7 +104,9 @@
     (assoc twitter-update-status :body "x=foo&y=bar")
     {"x" "foo" "y" "bar"}
     {:body (StringEntity. (:body twitter-update-status))}
-    {"status" "Hello Ladies + Gentlemen, a signed OAuth request!"}))
+    {"status" "Hello Ladies + Gentlemen, a signed OAuth request!"}
+    {:body "c2&a3=2+q"}
+    {"c2" "", "a3" "2 q"}))
 
 (deftest test-random-base64
   (is (string? (random-base64 1)))
