@@ -135,13 +135,21 @@
       (replace "%7E" "~")
       (replace "*" "%2A")
       (replace "+" "%20")))
+      
+(defn unpack-double [p]
+    [[(p 0) ((last p) 0)]
+     [(p 0) ((last p) 1)]])
 
 (defn format-params
   "Returns OAuth formatted OAuth params."
   [params]
-  (->> (seq params)
-       (map #(str (percent-encode (first %1)) "=" (percent-encode (last %1))))
-       (sort) (join "&")))
+      (->> (seq params)
+           (mapcat #(if (and (vector? (last %1)) (= (count (last %1)) 2)) 
+                        (unpack-double %1)
+                        [%1]))
+           (map #(str (percent-encode (first %1)) "=" (percent-encode (last %1))))
+           (sort) (join "&")
+           ))
 
 (defn random-bytes
   "Returns a random byte array of the specified size."

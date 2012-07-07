@@ -4,6 +4,22 @@
         clojure.test
         oauth.test.twitter
         oauth.v1))
+        
+(def rfc-request  { :method :post
+                    :scheme "http"
+                    :server-name "example.com"
+                    :content-type "application/x-www-form-urlencoded"
+                    :uri "/request"
+                    :query-params { :b5 "=%3D"
+                                    :a3 "a"
+                                    (keyword "c@") ""
+                                    :a2 "r b"}
+                    :oauth-consumer-key "9djdj82h48djs9d2"
+                    :oauth-nonce "7d8f3e4a"
+                    :oauth-signature-method "HMAC-SHA1"
+                    :oauth-timestamp "137131201"
+                    :oauth-token "kkk9d7dh3k39sjv7"
+                    :body "c2&a3=2+q"})
 
 (deftest test-oauth-authorization-header
   (is (= (str "OAuth "
@@ -50,7 +66,11 @@
               "oauth_token=370773112-GmHxMAgYyLbNEtIKZeRNFsMKPR9EyMZeS9weJAEb&"
               "oauth_version=1.0&"
               "status=Hello%20Ladies%20%2B%20Gentlemen%2C%20a%20signed%20OAuth%20request%21")
-         (oauth-parameter-string twitter-update-status))))
+         (oauth-parameter-string twitter-update-status)))
+  (is (= (str "a2=r%20b&a3=2%20q&a3=a&b5=%3D%253D&c%40=&c2=&oauth_consumer_key=9dj"
+              "dj82h48djs9d2&oauth_nonce=7d8f3e4a&oauth_signature_method=HMAC-SHA1"
+              "&oauth_timestamp=137131201&oauth_token=kkk9d7dh3k39sjv7")
+         (oauth-parameter-string rfc-request))))
 
 (deftest test-oauth-signature-parameters
   (is (= {} (oauth-signature-parameters nil)))
@@ -65,12 +85,15 @@
     (is (= "370773112-GmHxMAgYyLbNEtIKZeRNFsMKPR9EyMZeS9weJAEb" (get params "oauth_token")))
     (is (= "1.0" (get params "oauth_version")))
     (is (= "Hello Ladies + Gentlemen, a signed OAuth request!" (get params "status")))))
+    
+    
 
 (deftest test-oauth-request-signature
   (is (= "tnnArxj06cWHq44gCs1OSKk/jLY="
          (oauth-request-signature twitter-update-status "kAcSOqF21Fu85e7zjz7ZN2U4ZRhfV3WpwPAoE3Z7kBw" "LswwdoUaIvS8ltyTt5jkRh4J50vUPVVHtR2YPi5kE")))
   (is (= "8wUi7m5HFQy76nowoCThusfgB+Q="
          (oauth-request-signature twitter-request-token "MCD8BKwGdgPHvAuvgvz4EQpqDAtx89grbuNMRd7Eh98" nil))))
+         
 
 (deftest test-oauth-signature-base
   (is (= (str "POST&"
@@ -92,7 +115,8 @@
               "oauth_signature_method%3DHMAC-SHA1%26"
               "oauth_timestamp%3D1272323042%26"
               "oauth_version%3D1.0")
-         (oauth-signature-base twitter-request-token))))
+         (oauth-signature-base twitter-request-token))) 
+  (is (= "POST&http%3A%2F%2Fexample.com%2Frequest&a2%3Dr%2520b%26a3%3D2%2520q%26a3%3Da%26b5%3D%253D%25253D%26c%2540%3D%26c2%3D%26oauth_consumer_key%3D9djdj82h48djs9d2%26oauth_nonce%3D7d8f3e4a%26oauth_signature_method%3DHMAC-SHA1%26oauth_timestamp%3D137131201%26oauth_token%3Dkkk9d7dh3k39sjv7" (oauth-signature-base rfc-request) )))
 
 (deftest test-oauth-signing-key
   (are [consumer-secret token-secret expected]

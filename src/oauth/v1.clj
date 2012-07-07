@@ -26,7 +26,8 @@
 (defn oauth-signature-parameters
   "Returns the OAuth signature parameters from `request`."
   [request]
-  (-> (merge (parse-body-params request)
+  (-> (merge-with (partial conj [])
+             (parse-body-params request)
              (oauth-params (dissoc request :oauth-consumer-secret :oauth-token-secret))
              (transform-keys (:query-params request) name))
       (compact-map)))
