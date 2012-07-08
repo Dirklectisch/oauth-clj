@@ -46,7 +46,7 @@
 
 (defn oauth-signing-key
   "Returns the OAuth signing key."
-  [key secret] (str key "&" secret))
+  [key secret] (str (percent-encode key) "&" (percent-encode secret)))
 
 (defn oauth-request-signature
   "Calculates the OAuth signature from `request`."

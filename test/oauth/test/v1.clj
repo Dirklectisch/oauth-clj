@@ -121,12 +121,18 @@
 (deftest test-oauth-signing-key
   (are [consumer-secret token-secret expected]
     (is (= expected (oauth-signing-key consumer-secret token-secret)))
+    nil nil
+    "&"
+    "" ""
+    "&"
     "MCD8BKwGdgPHvAuvgvz4EQpqDAtx89grbuNMRd7Eh98" nil
     "MCD8BKwGdgPHvAuvgvz4EQpqDAtx89grbuNMRd7Eh98&"
     "MCD8BKwGdgPHvAuvgvz4EQpqDAtx89grbuNMRd7Eh98" ""
     "MCD8BKwGdgPHvAuvgvz4EQpqDAtx89grbuNMRd7Eh98&"
     "kAcSOqF21Fu85e7zjz7ZN2U4ZRhfV3WpwPAoE3Z7kBw" "LswwdoUaIvS8ltyTt5jkRh4J50vUPVVHtR2YPi5kE"
-    "kAcSOqF21Fu85e7zjz7ZN2U4ZRhfV3WpwPAoE3Z7kBw&LswwdoUaIvS8ltyTt5jkRh4J50vUPVVHtR2YPi5kE"))
+    "kAcSOqF21Fu85e7zjz7ZN2U4ZRhfV3WpwPAoE3Z7kBw&LswwdoUaIvS8ltyTt5jkRh4J50vUPVVHtR2YPi5kE"
+    "!#$&'()*+,/:;=?@[]" "!#$&'()*+,/:;=?@[]"
+    "%21%23%24%26%27%28%29%2A%2B%2C%2F%3A%3B%3D%3F%40%5B%5D&%21%23%24%26%27%28%29%2A%2B%2C%2F%3A%3B%3D%3F%40%5B%5D"))
 
 (deftest test-oauth-timestamp
   (is (number? (oauth-timestamp))))
