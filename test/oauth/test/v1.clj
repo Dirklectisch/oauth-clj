@@ -21,6 +21,29 @@
                     :oauth-token "kkk9d7dh3k39sjv7"
                     :body "c2&a3=2+q"})
 
+(def acc-example  {:method :post
+                    :scheme "https"
+                    :server-name "photos.example.net"
+                    :uri "/token"
+                    :oauth-consumer-key "dpf43f3p2l4k3l03"
+                    :oauth-nonce "walatlh"
+                    :oauth-signature-method "HMAC-SHA1"
+                    :oauth-timestamp "137131201"
+                    :oauth-token "hh5s93j4hdidpola"
+                    :oauth-verifier "hfdp7dh39dks9884"})
+
+(def li-request   { :method :post
+                    :scheme "https"
+                    :server-name "api.linkedin.com"
+                    :uri "/uas/oauth/accessToken"
+                    :oauth-consumer-key "e8l18ty3ingv"
+                    :oauth-nonce "YjtU2Eni5m7kT1S1FBYH3JubXNnzLj5YAU2OXd6kI"
+                    :oauth-signature-method "HMAC-SHA1"
+                    :oauth-timestamp "1341777929"
+                    :oauth-token "b2410402-5b08-4386-8abd-e4866521b39d"
+                    :oauth-verifier "08157"
+                    :oauth-version "1.0"})
+
 (deftest test-oauth-authorization-header
   (is (= (str "OAuth "
               "oauth_consumer_key=\"xvz1evFS4wEEPTGEFPHBog\", "
@@ -38,7 +61,26 @@
               "oauth_timestamp=\"1272323042\", "
               "oauth_version=\"1.0\"")
          (oauth-authorization-header
-          (oauth-sign-request twitter-request-token "MCD8BKwGdgPHvAuvgvz4EQpqDAtx89grbuNMRd7Eh98" nil)))))
+          (oauth-sign-request twitter-request-token "MCD8BKwGdgPHvAuvgvz4EQpqDAtx89grbuNMRd7Eh98" nil))))
+    (is (= (str "OAuth "
+                "oauth_consumer_key=\"9djdj82h48djs9d2\", "
+                "oauth_nonce=\"7d8f3e4a\", "
+                "oauth_signature=\"r6%2FTJjbCOr97%2F%2BUU0NsvSne7s5g%3D\", "
+                "oauth_signature_method=\"HMAC-SHA1\", "
+                "oauth_timestamp=\"137131201\", "
+                "oauth_token=\"kkk9d7dh3k39sjv7\"")
+            (oauth-authorization-header
+                (oauth-sign-request rfc-request "j49sk3j29djd" "dh893hdasih9"))))
+    (is (= (str "OAuth "
+                "oauth_consumer_key=\"dpf43f3p2l4k3l03\", "
+                "oauth_nonce=\"walatlh\", "
+                "oauth_signature=\"gKgrFCywp7rO0OXSjdot%2FIHF7IU%3D\", "
+                "oauth_signature_method=\"HMAC-SHA1\", "
+                "oauth_timestamp=\"137131201\", "
+                "oauth_token=\"hh5s93j4hdidpola\", "
+                "oauth_verifier=\"hfdp7dh39dks9884\"")
+            (oauth-authorization-header
+                (oauth-sign-request acc-example "kd94hf93k423kf44" "hdhd0244k9j7ao03")))))
 
 (deftest test-oauth-authorize
   (let [expected "https://api.twitter.com/oauth/authorize?oauth_token=9BVHFCl8PCvGekptmdtL1169QkppJG6PgpUDQDWow"]
@@ -70,7 +112,14 @@
   (is (= (str "a2=r%20b&a3=2%20q&a3=a&b5=%3D%253D&c%40=&c2=&oauth_consumer_key=9dj"
               "dj82h48djs9d2&oauth_nonce=7d8f3e4a&oauth_signature_method=HMAC-SHA1"
               "&oauth_timestamp=137131201&oauth_token=kkk9d7dh3k39sjv7")
-         (oauth-parameter-string rfc-request))))
+         (oauth-parameter-string rfc-request)))
+   (is (= (str "oauth_consumer_key=dpf43f3p2l4k3l03&"
+               "oauth_nonce=walatlh&"
+               "oauth_signature_method=HMAC-SHA1&"
+               "oauth_timestamp=137131201&"
+               "oauth_token=hh5s93j4hdidpola&"
+               "oauth_verifier=hfdp7dh39dks9884")
+          (oauth-parameter-string acc-example))))
 
 (deftest test-oauth-signature-parameters
   (is (= {} (oauth-signature-parameters nil)))
@@ -92,7 +141,11 @@
   (is (= "tnnArxj06cWHq44gCs1OSKk/jLY="
          (oauth-request-signature twitter-update-status "kAcSOqF21Fu85e7zjz7ZN2U4ZRhfV3WpwPAoE3Z7kBw" "LswwdoUaIvS8ltyTt5jkRh4J50vUPVVHtR2YPi5kE")))
   (is (= "8wUi7m5HFQy76nowoCThusfgB+Q="
-         (oauth-request-signature twitter-request-token "MCD8BKwGdgPHvAuvgvz4EQpqDAtx89grbuNMRd7Eh98" nil))))
+         (oauth-request-signature twitter-request-token "MCD8BKwGdgPHvAuvgvz4EQpqDAtx89grbuNMRd7Eh98" nil)))
+  (is (= "r6/TJjbCOr97/+UU0NsvSne7s5g="
+         (oauth-request-signature rfc-request "j49sk3j29djd" "dh893hdasih9")))
+  (is (= "gJH4fY413EuOqtW1D2/VJ/9fyI8="
+         (oauth-request-signature li-request "ISN8ACRuZMnx7LSb" "a2ea83fb-eab3-4f49-91a4-64eb9c4c9c49"))))
          
 
 (deftest test-oauth-signature-base
@@ -116,7 +169,8 @@
               "oauth_timestamp%3D1272323042%26"
               "oauth_version%3D1.0")
          (oauth-signature-base twitter-request-token))) 
-  (is (= "POST&http%3A%2F%2Fexample.com%2Frequest&a2%3Dr%2520b%26a3%3D2%2520q%26a3%3Da%26b5%3D%253D%25253D%26c%2540%3D%26c2%3D%26oauth_consumer_key%3D9djdj82h48djs9d2%26oauth_nonce%3D7d8f3e4a%26oauth_signature_method%3DHMAC-SHA1%26oauth_timestamp%3D137131201%26oauth_token%3Dkkk9d7dh3k39sjv7" (oauth-signature-base rfc-request) )))
+  (is (= "POST&http%3A%2F%2Fexample.com%2Frequest&a2%3Dr%2520b%26a3%3D2%2520q%26a3%3Da%26b5%3D%253D%25253D%26c%2540%3D%26c2%3D%26oauth_consumer_key%3D9djdj82h48djs9d2%26oauth_nonce%3D7d8f3e4a%26oauth_signature_method%3DHMAC-SHA1%26oauth_timestamp%3D137131201%26oauth_token%3Dkkk9d7dh3k39sjv7" (oauth-signature-base rfc-request) ))
+  (is (= "POST&https%3A%2F%2Fapi.linkedin.com%2Fuas%2Foauth%2FaccessToken&oauth_consumer_key%3De8l18ty3ingv%26oauth_nonce%3DYjtU2Eni5m7kT1S1FBYH3JubXNnzLj5YAU2OXd6kI%26oauth_signature_method%3DHMAC-SHA1%26oauth_timestamp%3D1341777929%26oauth_token%3Db2410402-5b08-4386-8abd-e4866521b39d%26oauth_verifier%3D08157%26oauth_version%3D1.0" (oauth-signature-base li-request))))
 
 (deftest test-oauth-signing-key
   (are [consumer-secret token-secret expected]
@@ -142,7 +196,17 @@
     #(is (= "tnnArxj06cWHq44gCs1OSKk/jLY=" (:oauth-signature %1))))
    (assoc twitter-update-status
      :oauth-consumer-secret "kAcSOqF21Fu85e7zjz7ZN2U4ZRhfV3WpwPAoE3Z7kBw"
-     :oauth-token-secret "LswwdoUaIvS8ltyTt5jkRh4J50vUPVVHtR2YPi5kE")))
+     :oauth-token-secret "LswwdoUaIvS8ltyTt5jkRh4J50vUPVVHtR2YPi5kE"))
+  ((wrap-oauth-signature
+   #(is (= "r6/TJjbCOr97/+UU0NsvSne7s5g=" (:oauth-signature %1))))
+  (assoc rfc-request
+    :oauth-consumer-secret "j49sk3j29djd"
+    :oauth-token-secret "dh893hdasih9"))
+  ((wrap-oauth-signature
+   #(is (= "gKgrFCywp7rO0OXSjdot/IHF7IU=" (:oauth-signature %1))))
+  (assoc acc-example
+    :oauth-consumer-secret "kd94hf93k423kf44"
+    :oauth-token-secret "hdhd0244k9j7ao03")))
 
 (deftest test-make-consumer
   (let [consumer (make-consumer)]

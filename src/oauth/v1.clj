@@ -129,12 +129,14 @@
 
 (defn oauth-request-token
   "Obtain the OAuth request token to request user authorization."
-  [url oauth-consumer-key oauth-consumer-secret]
-  (-> ((make-consumer
-        :oauth-consumer-key oauth-consumer-key
-        :oauth-consumer-secret oauth-consumer-secret)
-       {:method :post :url url})
-      parse-body))
+  ([url oauth-consumer-key oauth-consumer-secret] (oauth-request-token url oauth-consumer-key oauth-consumer-secret "oob"))
+  ([url oauth-consumer-key oauth-consumer-secret oauth-callback]
+    (-> ((make-consumer
+          :oauth-consumer-key oauth-consumer-key
+          :oauth-consumer-secret oauth-consumer-secret
+          :oauth-callback oauth-callback)
+         {:method :post :url url})
+        parse-body)))
 
 (defn oauth-client
   "Returns a HTTP client for version 1 of the OAuth protocol."
