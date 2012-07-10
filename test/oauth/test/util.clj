@@ -42,7 +42,11 @@
      :server-name "www.example.net"
      :server-port 8080
      :uri "/"
-     :query-params {:q 1}} "https://www.example.net:8080/"))
+     :query-params {:q 1}} "https://www.example.net:8080/"
+    {:method :post
+     :scheme "https"
+     :server-name "www.example.net"
+     :uri "/uas/oauth/accessToken"} "https://www.example.net/uas/oauth/accessToken"))
 
 (deftest test-format-authorization
   (= (str "OAuth" (format-options twitter-update-status)) (format-authorization twitter-update-status)))
