@@ -119,13 +119,17 @@
 
 (defn oauth-access-token
   "Obtain the OAuth access token."
-  [url oauth-consumer-key oauth-token oauth-verifier]
-  (-> ((make-consumer
-        :oauth-consumer-key oauth-consumer-key
-        :oauth-token oauth-token
-        :oauth-verifier oauth-verifier)
-       {:method :post :url url})
-      parse-body))
+  ([url oauth-consumer-key oauth-token oauth-verifier] 
+    (oauth-access-token url oauth-consumer-key nil oauth-token nil oauth-verifier))
+  ([url oauth-consumer-key oauth-consumer-secret oauth-token oauth-token-secret oauth-verifier]
+    (-> ((make-consumer
+          :oauth-consumer-key oauth-consumer-key
+          :oauth-consumer-secret oauth-consumer-secret
+          :oauth-token oauth-token
+          :oauth-token-secret oauth-token-secret
+          :oauth-verifier oauth-verifier)
+         {:method :post :url url})
+        parse-body)))
 
 (defn oauth-request-token
   "Obtain the OAuth request token to request user authorization."
